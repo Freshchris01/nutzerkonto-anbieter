@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
 		const availableKeys = serviceProvider.dataKeys;
 		const wantedKeys = JSON.parse(req.query.wantedKeys);
 		const dataKeys = getIntersection(availableKeys, wantedKeys);
-		axios.get(`${process.env.HOST_NUTZERKONTO}/nutzerkonto-datenuebertragen`, {
+		axios.get(`${process.env.HOST_NUTZERKONTO}/nutzerkonto-datenuebertragen/`, {
 			headers: {
 				Cookie: buildCookieString(req.cookies)
 			},
