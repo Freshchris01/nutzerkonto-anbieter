@@ -60,6 +60,7 @@ app.get('/', (req, res) => {
 				dataKeys: Object.keys(response.data),
 				data: response.data,
 				redirect: serviceProvider.path,
+				login_action_host: process.env.HOST_NUTZERKONTO
 			};
 			res.render(serviceProvider.template, templateData);
 		}).catch(error => {
