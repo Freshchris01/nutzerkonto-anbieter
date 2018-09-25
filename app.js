@@ -1,7 +1,6 @@
 ﻿'use strict';
 
 const express = require('express');
-const session = require('express-session');
 const expressHbs = require('express-handlebars');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -32,39 +31,23 @@ app.engine('hbs', expressHbs({
 }));
 app.set('view engine', 'hbs');
 
-
-app.get('/', (req, res) => {
-	res.render('index');
-});
-
 app.get('/success', (req, res) => {
 	res.render('success');
 });
 
-// service providers
-
-const serviceProviders = [{
+const serviceProvider = {
 	name: 'Bafög leistungsabhängiger Teilerlass',
-	path: 'https://nutzerkonto-sp.azurewebsites.net',
+	path: process.env.HOST_NUTZERKONTO_SP,
 	dataKeys: ['anrede', 'titel', 'namensbestandteil', 'nachname', 'vorname', 'geburtsdatum', 'geburtsname', 'studiumAbschlussdatum', 'bemerkung'],
 	template: 'anbieterBafoegLeistungsabhaengigerTeilerlass'
-}];
+};
 
-// const memoryStore = new session.MemoryStore();
-
-// app.use(session({
-// 	secret: 'nutzerkonto-tech4germany',
-// 	resave: false,
-// 	saveUninitialized: true,
-// 	store: memoryStore
-// }));
-
-app.get(serviceProviders[0].path, (req, res) => {
+app.get('/', (req, res) => {
 	if (req.query.wantedKeys) {
-		const availableKeys = serviceProviders[0].dataKeys;
+		const availableKeys = serviceProvider.dataKeys;
 		const wantedKeys = JSON.parse(req.query.wantedKeys);
 		const dataKeys = getIntersection(availableKeys, wantedKeys);
-		axios.get(`${config.NUTZERKONTO}/nutzerkonto-datenuebertragen`, {
+		axios.get(`${process.env.HOST_NUTZERKONTO}/nutzerkonto-datenuebertragen`, {
 			headers: {
 				Cookie: buildCookieString(req.cookies)
 			},
@@ -73,22 +56,23 @@ app.get(serviceProviders[0].path, (req, res) => {
 			}
 		}).then(response => {
 			const templateData = {
-				title: serviceProviders[0].name,
+				title: serviceProvider.name,
 				dataKeys: Object.keys(response.data),
 				data: response.data,
-				redirect: serviceProviders[0].path,
+				redirect: serviceProvider.path,
 			};
-			res.render(serviceProviders[0].template, templateData);
+			res.render(serviceProvider.template, templateData);
 		}).catch(error => {
 			console.log(error);
 		});
 	} else {
 		const templateData = {
-			title: serviceProviders[0].name,
-			dataKeys: serviceProviders[0].dataKeys,
-			redirect: serviceProviders[0].path,
+			title: serviceProvider.name,
+			dataKeys: serviceProvider.dataKeys,
+			redirect: serviceProvider.path,
+			login_action_host: process.env.HOST_NUTZERKONTO
 		};
-		res.render(serviceProviders[0].template, templateData);
+		res.render(serviceProvider.template, templateData);
 	}
 });
 
