@@ -9,8 +9,6 @@ const axios = require('axios');
 
 require('dotenv').config();
 
-const config = require('./config');
-
 const app = express();
 
 app.use('/css', express.static(__dirname + '/css'));
@@ -47,6 +45,7 @@ app.get('/', (req, res) => {
 		const availableKeys = serviceProvider.dataKeys;
 		const wantedKeys = JSON.parse(req.query.wantedKeys);
 		const dataKeys = getIntersection(availableKeys, wantedKeys);
+		console.log(req.cookies);
 		axios.get(`${process.env.HOST_NUTZERKONTO}/nutzerkonto-datenuebertragen/`, {
 			headers: {
 				Cookie: buildCookieString(req.cookies)
